@@ -1,5 +1,5 @@
 from flask import Flask, jsonify
-import primes                      # Our own Python file to calculate Primes
+import primes  # Our own Python file to calculate Primes
 import time
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import Column, Integer, String
@@ -11,7 +11,6 @@ app = Flask(__name__)
 # Set up configuration for DB
 basedir = os.path.abspath(os.path.dirname(__file__))
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'Hist.db')
-
 
 # Initialize database
 db = SQLAlchemy(app)
@@ -35,45 +34,46 @@ def db_drop():
 
 @app.route('/')
 def home():
-    return jsonify({'massage ': 'Choose your algorithm', 'method-1': 'Naive Method', 'method-2': 'Sieve of Eratosthenes'})
+    return jsonify(
+        {'massage ': 'Choose your algorithm', 'method-1': 'Naive Method', 'method-2': 'Sieve of Eratosthenes'})
 
 
 # Route for method2 i.e. Naive method
-@app.route('/method1/<int:start>/<int:end>', methods=['POST', 'GET'])
+@app.route('/method1/<int:start>/<int:end>', methods=['POST'])
 def naive_method(start: int, end: int):
+    if start > end:
+        start, end = end, start
     method = 'Naive Method'
     t0 = time.time()
     res = primes.PrimeCalculator.method1(start, end)
     t1 = time.time()
-    new_record = Records(timestamp=str(time.strftime("%D-%H:%M:%S", time.localtime())),
-                         start_no=start,
-                         end_no=end,
-                         time_elapsed=str((t1*1000) - (t0*1000)),
-                         method_chosen=method,
-                         result=str(res))
-
-    db.session.add(new_record)
-    db.session.commit()
-    return jsonify(massege=str(res), time=str((t1*1000) - (t0*1000))+' ms'), 201
+    insert_to_db(method, t0, res, t1, start, end)
+    return jsonify(massege=str(res)), 201
 
 
 # Route for method2 i.e. Sieve of Eratosthenes method
 @app.route('/method2/<int:start>/<int:end>', methods=['POST'])
 def efficient_method(start: int, end: int):
+    if start > end:
+        start, end = end, start
     method = 'Sieve of Eratosthenes method'
     t0 = time.time()
     res = primes.PrimeCalculator.method2(start, end)
     t1 = time.time()
+    insert_to_db(method, t0, res, t1, start, end)
+    return jsonify(str(res)), 201
+
+
+def insert_to_db(method, t0, res, t1, start, end):
     new_record = Records(timestamp=str(time.strftime("%D-%H:%M:%S", time.localtime())),
                          start_no=start,
                          end_no=end,
-                         time_elapsed=str((t1*1000) - (t0*1000)),
+                         time_elapsed=str((t1 * 1000) - (t0 * 1000)),
                          method_chosen=method,
                          result=str(res))
 
     db.session.add(new_record)
     db.session.commit()
-    return jsonify(massege=str(res), time=str((t1*1000) - (t0*1000))+' ms'), 201
 
 
 # route to show all records
@@ -82,6 +82,17 @@ def display_records():
     temp = Records.query.all()
     all_records = records_schema.dump(temp)
     return jsonify(all_records)
+
+
+@app.route('/clear', methods=['DELETE'])
+def clear():
+    try:
+        db.session.query(Records).delete()
+        db.session.commit()
+        return jsonify('Database cleared successfully!')
+    except:
+        db.session.rollback()
+        return jsonify('Something went wrong!')
 
 
 # Database Models
