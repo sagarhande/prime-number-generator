@@ -1,5 +1,5 @@
 from flask import Flask, jsonify
-import primes  # Our own Python file to calculate Primes
+import primes  # Python file to calculate Primes
 import time
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import Column, Integer, String
@@ -35,33 +35,30 @@ def db_drop():
 @app.route('/')
 def home():
     return jsonify(
-        {'massage ': 'Choose your algorithm', 'method-1': 'Naive Method', 'method-2': 'Sieve of Eratosthenes'})
+        {'0': 'Choose your algorithm', '1': 'Naive Method', '2': 'Sieve of Eratosthenes'})
 
 
-# Route for method2 i.e. Naive method
-@app.route('/method1/<int:start>/<int:end>', methods=['POST'])
-def naive_method(start: int, end: int):
-    if start > end:
-        start, end = end, start
-    method = 'Naive Method'
-    t0 = time.time()
-    res = primes.PrimeCalculator.method1(start, end)
-    t1 = time.time()
-    insert_to_db(method, t0, res, t1, start, end)
-    return jsonify(massege=str(res)), 201
-
-
-# Route for method2 i.e. Sieve of Eratosthenes method
-@app.route('/method2/<int:start>/<int:end>', methods=['POST'])
-def efficient_method(start: int, end: int):
-    if start > end:
-        start, end = end, start
-    method = 'Sieve of Eratosthenes method'
-    t0 = time.time()
-    res = primes.PrimeCalculator.method2(start, end)
-    t1 = time.time()
-    insert_to_db(method, t0, res, t1, start, end)
-    return jsonify(str(res)), 201
+# Route to calculate primes 1=Naive  and  2=Sieve of Eratosthenes
+@app.route('/cal/<int:method>/<string:start>/<string:end>', methods=['POST'])
+def calculate(method: int, start: str, end: str):
+    try:
+        start, end = int(start), int(end)
+        if start < 0 or end < 0 or method not in [1, 2]:
+            return jsonify('Please provide correct parameters!'), 401
+        if start > end:
+            start, end = end, start
+        t0 = time.time()
+        if method == 1:
+            method = 'Naive'
+            res = primes.PrimeCalculator.method1(start, end)
+        else:
+            method = 'Sieve of Eratosthenes'
+            res = primes.PrimeCalculator.method2(start, end)
+        t1 = time.time()
+        insert_to_db(method, t0, res, t1, start, end)
+        return jsonify(massege=str(res)), 201
+    except:
+        return jsonify('Please create DB first !'), 404
 
 
 def insert_to_db(method, t0, res, t1, start, end):
@@ -92,7 +89,7 @@ def clear():
         return jsonify('Database cleared successfully!')
     except:
         db.session.rollback()
-        return jsonify('Something went wrong!')
+        return jsonify('Something went wrong! Please check if database created !'), 404
 
 
 # Database Models
