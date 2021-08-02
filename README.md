@@ -18,8 +18,8 @@ To run this API you will need _Python 3.8_ along with below liabraries installed
 *Step-1)* Run app.py : `Python app.py`<br />
 *Step-2)* Use following endpoints for requests .It will return a JSON . <br />
  * Home Route (GET) : `http://127.0.0.1:5000/`<br />
- * Method-1 (POST) : `http://127.0.0.1:5000/method1/start/end`<br />
- * Method-2 (POST) : `http://127.0.0.1:5000/method2/start/end`<br />
+ * Method-1 (POST) : `http://127.0.0.1:5000/cal/1/start/end`<br />
+ * Method-2 (POST) : `http://127.0.0.1:5000/cal/2/start/end`<br />
   *Note: Please provide positive integers **start** and **end***<br/>
  * Get all records (GET) : `http://127.0.0.1:5000/records`<br />
  * Clear records from database (DELETE) : `http://127.0.0.1:5000/clear`<br />
