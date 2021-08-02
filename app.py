@@ -38,7 +38,9 @@ def home():
         {'0': 'Choose your algorithm', '1': 'Naive Method', '2': 'Sieve of Eratosthenes'})
 
 
-# Route to calculate primes 1=Naive  and  2=Sieve of Eratosthenes
+# Route to calculate primes
+# 1. Naive
+# 2. Sieve of Eratosthenes
 @app.route('/cal/<int:method>/<string:start>/<string:end>', methods=['POST'])
 def calculate(method: int, start: str, end: str):
     try:
@@ -61,6 +63,7 @@ def calculate(method: int, start: str, end: str):
         return jsonify('Please create DB first !'), 404
 
 
+# Function to insert record into table
 def insert_to_db(method, t0, res, t1, start, end):
     new_record = Records(timestamp=str(time.strftime("%D-%H:%M:%S", time.localtime())),
                          start_no=start,
@@ -81,6 +84,7 @@ def display_records():
     return jsonify(all_records)
 
 
+# route to clear all records from table Records
 @app.route('/clear', methods=['DELETE'])
 def clear():
     try:
