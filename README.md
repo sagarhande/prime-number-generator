@@ -1,3 +1,5 @@
+
+
 # Prime-number-generator
 This repository contain a RESTful Flask API for generating prime numbers in range.
 I used sqlalchemy as ORM for this API, along with SQLite DB.
