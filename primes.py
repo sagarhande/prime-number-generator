@@ -30,6 +30,8 @@ def cal_low_primes(low_primes, end):
         if temp[k]:
             low_primes.append(k)
 
+def timepass():
+    print("I'm here to timepass...")
 
 # main driver class
 class PrimeCalculator:
