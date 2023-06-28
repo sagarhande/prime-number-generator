@@ -33,6 +33,7 @@ def cal_low_primes(low_primes, end):
 def timepass():
     print("I'm here to timepass...")
     print("Go and clean the dishes...")
+    print("go and study...")
 
 # main driver class
 class PrimeCalculator:
